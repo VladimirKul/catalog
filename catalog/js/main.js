@@ -1,8 +1,3 @@
-const TITLE = ['Apple MacBook Pro 16', 'Apple MacBook Air 13', 'Apple iMac 27', 'Apple iMac Pro', 'Apple Mac mini', 'Apple Mac Pro']
-const PRICE = ['222900', '114900', '199900', '399900', '102900', '349900']
-const ID = [1, 2, 3, 4, 5, 6]
-const IMG = ['macbook-pro.jpg', 'macbook-air.jpg', 'imac.jpg', 'imac-pro.jpg', 'mac-mini.jpg', 'mac-pro.jpg']
-
 class Product {
     constructor(product) {
         this.title = product.title
@@ -33,14 +28,27 @@ class Products {
     constructor(block) {
         this.block = `.${block}`
         this.products = []
+        this.arrProducts = []
+        this.catalogUrl = 'https://raw.githubusercontent.com/VladimirKul/catalog/master/catalog/catalogData.json'
         this._init()
     }
 
     _init() {
-        list.forEach(item => {
-            this.products.push(new Product(item))
-        })
-        this.render()
+        this.getReq(this.catalogUrl)
+    }
+
+    getReq(url) {
+        fetch(url)
+            .then(data => data.json())
+            .then(data => {this.arrProducts = data})
+            .then(() => {
+                this.arrProducts.forEach((item) => {
+                    this.products.push(new Product(item))
+                })
+            })
+            .then(() => {
+                this.render()
+            })
     }
 
     render() {
@@ -54,25 +62,5 @@ class Products {
         block.innerHTML = str
     }
 }
-
-let  list = []
-
-let getListProducts = function() {
-    for(let i = 0; i < ID.length; i++) {
-        list.push(getItemList(ID[i], TITLE[i], PRICE[i], IMG[i]))
-    }
-}
-
-let getItemList = function(idProd, titleProd, priceProd, imgProd) {
-    return {
-        id: idProd,
-        title: titleProd,
-        price: priceProd,
-        img: imgProd
-    }
-}
-
-getListProducts()
-
 
 let a = new Products('catalog')
