@@ -1,3 +1,19 @@
+let btnCart = document.querySelector('.header__cart')
+let cartWrap = document.querySelector('.header__cartWrap')
+let active = false
+
+let activeCart = function() {
+    if(active) {
+        active = false
+        cartWrap.style.visibility = "hidden"
+    } else {
+        active = true
+        cartWrap.style.visibility = "visible"
+    }
+}
+
+btnCart.addEventListener('click', activeCart)
+
 class Product {
     constructor(product) {
         this.title = product.title
@@ -12,7 +28,7 @@ class Product {
                         <img src="img/${this.img}" alt="img" class="catalog__img">
                     </div>
                     <div class="catalog__title">${this.title}</div>
-                    <div class="catalog__price">2${this.price}<span> руб.</span></div>
+                    <div class="catalog__price">${this.price}<span> руб.</span></div>
                     <button class="catalog__btn"
                         data-id="${this.id}"
                         data-title="${this.title}"
@@ -60,6 +76,18 @@ class Products {
         })
 
         block.innerHTML = str
+    }
+}
+
+class Cart {
+    constructor() {
+
+    }
+}
+
+class CartItem {
+    constructor() {
+
     }
 }
 
