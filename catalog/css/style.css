@@ -109,6 +109,7 @@ nav {
 
 .header__blockimg {
     width: 150px;
+    margin: 0 auto;
 }
 
 .header__img {
@@ -127,6 +128,11 @@ nav {
     border-radius: 3px;
     outline: none;
     border: solid 1px #777777;
+}
+
+.header__amount,
+.header__quantity {
+    font-size: 0.8em;
 }
 
 main {

@@ -22,7 +22,6 @@ class List {//супер класс списка товаров
     getJSON(url) {
         return fetch(url)
             .then(data => data.json())
-            .then(data => {this.DTOarr = data})
     }
 
     render() {
@@ -50,7 +49,7 @@ class ListItem {
                     </div>
                     <div class="catalog__title">${this.title}</div>
                     <div class="catalog__price">${this.price}<span> руб.</span></div>
-                    <button class="catalog__btn"
+                    <button class="catalog__btn" onclick="cart.addProduct(this)"
                         data-id="${this.id}"
                         data-title="${this.title}"
                         data-price="${this.price}"
@@ -68,6 +67,7 @@ class ProductList extends List {
 
     _init() {
         this.getJSON(API + this.url)
+            .then(data => {this.DTOarr = data})
             .finally(() => {
                 this.render()
             })
@@ -87,15 +87,73 @@ class CartList extends List {
 
     _init() {
         this.getJSON(API + this.url)
+            .then(data => {this.DTOarr = data.contents})
             .finally(() => {
                 this.render()
             })
+    }
+
+    addProduct (product) {
+        let productId= +product.dataset['id']
+        let find = this.DTOarr.find (element => element.id === productId)
+        if(!find) {
+            console.log(product.dataset['img'])
+            let el = {
+                title: product.dataset['title'],
+                price: +product.dataset['price'],
+                id: productId,
+                img: product.dataset['img'],
+                quantity: 1
+            }
+            this.DTOarr.push (new lists[this.constructor.name](el))
+            this.render()
+        } else {
+            find.quantity++
+            document.querySelectorAll('.header__quantity').forEach(item => {
+                item.innerHTML = `Кол-во: ${find.quantity}`
+            })
+        }
+    }
+}
+
+let cart = new CartList()
+
+class CartItem extends ListItem{
+    constructor(el) {
+        super(el)
+        this.quantity = el.quantity
+    }
+
+    render() {
+        return ` <div class="header__cartItem">
+                    <div class="header__blockimg">
+                        <img src="img/macbook-pro.jpg" alt="img" class="header__img">
+                    </div>
+                    <div class="header__title">${this.title}</div>
+                    <div class="header__price">${this.price}<span> руб.</span></div>
+                    <div class="header__quantity">Кол-во: ${this.quantity}</div>
+                    <div class="header__amount">Общая цена: ${this.quantity*this.price}</div>
+                    <button class="header__btn" onclick="cart.addProduct(this)"
+                        data-id="${this.id}"
+                        data-title="${this.title}"
+                        data-price="${this.price}"
+                        data-img="${this.img}">
+                        +
+                    </button>
+                    <button class="header__btn"
+                        data-id="${this.id}"
+                        data-title="${this.title}"
+                        data-price="${this.price}"
+                        data-img="${this.img}">
+                        -
+                    </button>
+                </div>`
     }
 }
 
 const lists = {
     ProductList: ProductItem,
-    // CartList: CartItem
+    CartList: CartItem
 }
 
 let activeCart = function() {
@@ -106,6 +164,37 @@ let activeCart = function() {
         active = true
         cartWrap.style.visibility = "visible"
     }
+}
+
+function addProduct (product) {
+    let productId= + product.dataset['id']
+    let find = userCart.find (element => element.id === productId)
+
+    if(!find) {
+        userCart.push ({
+            name: product.dataset['name'],
+            id: productId,
+            img: product.dataset['img'],
+            price: +product.dataset['prce'],
+            quantity: 1
+        })
+    } else {
+        find.quantity++
+    }
+    renderCart()
+}
+
+function removeProduct (product) {
+    let productId= + product.dataset['id']
+    let find = userCart.find (element => element.id === productId)
+
+    if(find.quantity > 1) {
+        find.quantity--
+    } else {
+        userCart.splice(userCart.indexOf(find), 1)
+        document.querySelector(`.header__cartItem[data-id="${productId}"]`).remove()
+    }
+    renderCart()
 }
 
 btnCart.addEventListener('click', activeCart)
