@@ -2,24 +2,45 @@ let btnCart = document.querySelector('.header__cart')
 let cartWrap = document.querySelector('.header__cartWrap')
 let active = false
 
-let activeCart = function() {
-    if(active) {
-        active = false
-        cartWrap.style.visibility = "hidden"
-    } else {
-        active = true
-        cartWrap.style.visibility = "visible"
+const API = 'https://raw.githubusercontent.com/VladimirKul/catalog/master/catalog'
+
+class List {//супер класс списка товаров
+    constructor(url, container) {
+        //параметры, которые будут переназначаться при наследовании
+        this.url = url
+        this.container = container
+        //общие
+        this.items = []
+        this.DTOarr = []
+        this._init()
+    }
+
+    _init() {
+        return false //заглушка, будет переопределятся
+    }
+
+    getJSON(url) {
+        return fetch(url)
+            .then(data => data.json())
+            .then(data => {this.DTOarr = data})
+    }
+
+    render() {
+        const block = document.querySelector(this.container)
+        this.DTOarr.forEach(el => {
+            let item = new lists[this.constructor.name](el)
+            this.items.push(item)
+            block.insertAdjacentHTML('beforeend', item.render())
+        })
     }
 }
 
-btnCart.addEventListener('click', activeCart)
-
-class Product {
-    constructor(product) {
-        this.title = product.title
-        this.price = product.price
-        this.id = product.id
-        this.img = product.img
+class ListItem {
+    constructor(el) {
+        this.title = el.title
+        this.price = el.price
+        this.id = el.id
+        this.img = el.img
     }
 
     render() {
@@ -40,55 +61,51 @@ class Product {
     }
 }
 
-class Products {
-    constructor(block) {
-        this.block = `.${block}`
-        this.products = []
-        this.arrProducts = []
-        this.catalogUrl = 'https://raw.githubusercontent.com/VladimirKul/catalog/master/catalog/catalogData.json'
-        this._init()
+class ProductList extends List {
+    constructor(url = '/catalogData.json', container = '.catalog') {
+        super(url, container)
     }
 
     _init() {
-        this.getReq(this.catalogUrl)
-    }
-
-    getReq(url) {
-        fetch(url)
-            .then(data => data.json())
-            .then(data => {this.arrProducts = data})
-            .then(() => {
-                this.arrProducts.forEach((item) => {
-                    this.products.push(new Product(item))
-                })
-            })
-            .then(() => {
+        this.getJSON(API + this.url)
+            .finally(() => {
                 this.render()
             })
     }
+}
 
-    render() {
-        let block = document.querySelector(this.block)
-        let str = ``
+let product = new ProductList()
 
-        this.products.forEach(item => {
-            str += item.render()
-        })
+class ProductItem extends ListItem {
 
-        block.innerHTML = str
+}
+
+class CartList extends List {
+    constructor(url = '/getBasket.json', container = '.header__cartWrap') {
+        super(url, container)
+    }
+
+    _init() {
+        this.getJSON(API + this.url)
+            .finally(() => {
+                this.render()
+            })
     }
 }
 
-class Cart {
-    constructor() {
+const lists = {
+    ProductList: ProductItem,
+    // CartList: CartItem
+}
 
+let activeCart = function() {
+    if(active) {
+        active = false
+        cartWrap.style.visibility = "hidden"
+    } else {
+        active = true
+        cartWrap.style.visibility = "visible"
     }
 }
 
-class CartItem {
-    constructor() {
-
-    }
-}
-
-let a = new Products('catalog')
+btnCart.addEventListener('click', activeCart)

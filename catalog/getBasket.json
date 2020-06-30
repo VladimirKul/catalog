@@ -1,0 +1,13 @@
+{
+  "amount": 0,
+  "countGoods": 0,
+  "contents": [
+    {
+      "id": 1,
+      "title": "Apple MacBook Pro 16",
+      "price": 222900,
+      "quantity": 1,
+      "img": "macbook-pro.jpg"
+    }
+  ]
+}
